@@ -1,21 +1,25 @@
 package uk.ac.aston.tupperh.smalljh.textme;
+/**
+ * Used to read each sms that comes in
+ *
+ *
+ */
+import java.security.Provider;
+import java.util.Calendar;
+import java.util.List;
 
-        import java.security.Provider;
-        import java.util.Calendar;
-        import java.util.List;
-
-        import android.content.BroadcastReceiver;
-        import android.content.Context;
-        import android.content.Intent;
-        import android.location.Criteria;
-        import android.location.Location;
-        import android.location.LocationListener;
-        import android.location.LocationManager;
-        import android.os.Bundle;
-        import android.telephony.SmsManager;
-        import android.telephony.SmsMessage;
-        import android.util.Log;
-        import android.widget.Toast;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
+import android.util.Log;
+import android.widget.Toast;
 
 
 public class IncomingSms extends BroadcastReceiver implements LocationListener {
@@ -25,7 +29,7 @@ public class IncomingSms extends BroadcastReceiver implements LocationListener {
     private LocationManager locationManager;
     String phoneNo;
 
-
+    //Gets the new text message
     public void onReceive(Context context, Intent intent) {
         // Retrieves a map of extended data from the intent.
         final Bundle bundle = intent.getExtras();
@@ -44,14 +48,17 @@ public class IncomingSms extends BroadcastReceiver implements LocationListener {
                     String senderNum = phoneNumber;
                     String message = currentMessage.getDisplayMessageBody();
 
-                    Log.i("SmsReceiver", "senderNum: "+ senderNum + "; message: " + message);
-
-                    if(phoneNumber.equals("+447854977333")) {
 
 
+                    Log.i("SmsReceiver", "senderNum: " + senderNum + "; message: " + message);
+
+                    //if the text is from the server
+                    if (phoneNumber.equals("+441355377112")) {
+
+                        //need to do stuff!
                         // Show Alert
                         Toast toast = Toast.makeText(context,
-                                "senderNum: "+ senderNum + ", message: " + message, Toast.LENGTH_LONG);
+                                "senderNum: " + senderNum + ", message: " + message, Toast.LENGTH_LONG);
                         toast.show();
 
                         phoneNo = senderNum;
@@ -69,6 +76,8 @@ public class IncomingSms extends BroadcastReceiver implements LocationListener {
                             Log.v("Location Changed", "nkjhio");
                         }
 
+
+
                     } else {
                         //sms.sendTextMessage(phoneNumber, null, "Yo", null, null);
 
@@ -78,7 +87,7 @@ public class IncomingSms extends BroadcastReceiver implements LocationListener {
             } // bundle is null
 
         } catch (Exception e) {
-            Log.e("SmsReceiver", "Exception smsReceiver" +e);
+            Log.e("SmsReceiver", "Exception smsReceiver" + e);
 
         }
     }
@@ -116,7 +125,10 @@ public class IncomingSms extends BroadcastReceiver implements LocationListener {
 
     private void sendLoc(Location location) {
         final SmsManager sms = SmsManager.getDefault();
-        sms.sendTextMessage(phoneNo, null, "LNG: " + location.getLatitude() + " LAT: " + location.getLongitude(), null, null);
+        //sms.sendTextMessage("+441355377112", null, "LNG: " + location.getLatitude() + " LAT: " + location.getLongitude(), null, null);
+        sms.sendTextMessage("+441355377112", null, "Hello", null, null);
+
+
     }
 
 

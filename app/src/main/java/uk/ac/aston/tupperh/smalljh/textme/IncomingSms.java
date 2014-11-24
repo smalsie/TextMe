@@ -39,6 +39,7 @@ public class IncomingSms extends BroadcastReceiver implements
     private String provider;
     private LocationListener locationListener;
     private Context context;
+    private LocationClient locationClient;
 
     private final static int
             CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
@@ -81,50 +82,25 @@ public class IncomingSms extends BroadcastReceiver implements
 
                         if (servicesConnected()) {
 
-                            LocationClient locationClient = new LocationClient(context, this, this);
+                            locationClient = new LocationClient(context, this, this);
 
                             locationClient.connect();
 
-                            Location loc = locationClient.getLastLocation();
+                            Location loc = null;
+
+                            if(locationClient.isConnected()) {
+                                loc = locationClient.getLastLocation();
+
+                            }
+
 
                             sendLoc(loc);
 
 
                         } else {
 
-                            locationListener = new LocationListener() {
-                                @Override
-                                public void onLocationChanged(Location location) {
-                                    // TODO Auto-generated method stub
-                                    if (location != null) {
-                                        Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
+                            locationListener = new MyLocationListener();
 
-
-                                        sendLoc(location);
-
-
-                                    }
-                                    Log.v("Location Changed", "nkjhio");
-                                }
-
-                                @Override
-                                public void onStatusChanged(String provider, int status, Bundle extras) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                                @Override
-                                public void onProviderEnabled(String provider) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                                @Override
-                                public void onProviderDisabled(String provider) {
-                                    // TODO Auto-generated method stub
-
-                                }
-                            };
 
                             locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
@@ -136,6 +112,7 @@ public class IncomingSms extends BroadcastReceiver implements
                             Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
                             sendLoc(location);
                             locationManager.requestLocationUpdates(provider, 4000, 1, (LocationListener) locationListener);
+
                         }
 
 
@@ -207,8 +184,13 @@ public class IncomingSms extends BroadcastReceiver implements
 
     @Override
     public void onConnected(Bundle bundle) {
+        Log.d("LATLNG", "CONNECTED");
+        Location loc = locationClient.getLastLocation();
 
-    }
+        Log.d("LATLNG", loc.toString());
+         sendLoc(loc);
+
+}
 
     @Override
     public void onDisconnected() {
@@ -217,6 +199,43 @@ public class IncomingSms extends BroadcastReceiver implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
+        Toast.makeText(context, "Failed", Toast.LENGTH_LONG).show();
+    }
+
+    public class MyLocationListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            // TODO Auto-generated method stub
+            if (location != null) {
+                Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
+
+
+                sendLoc(location);
+
+
+            }
+            Log.v("Location Changed", "nkjhio");
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            // TODO Auto-generated method stub
+
+        }
+
 
     }
 }

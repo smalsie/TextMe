@@ -28,18 +28,12 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 
 
-public class IncomingSms extends BroadcastReceiver implements
-        GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener {
+public class IncomingSms extends BroadcastReceiver {
     // Get the object of SmsManager
 
-    private Location currentLocation;
-    private LocationManager locationManager;
+
     String phoneNo;
-    private String provider;
-    private LocationListener locationListener;
     private Context context;
-    private LocationClient locationClient;
 
     private final static int
             CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
@@ -71,53 +65,18 @@ public class IncomingSms extends BroadcastReceiver implements
 
                     //if the text is from the server
                     if (phoneNumber.equals("+441355377112")) {
-
-                        //need to do stuff!
-                        // Show Alert
-                        Toast toast = Toast.makeText(context,
-                                "senderNum: " + senderNum + ", message: " + message, Toast.LENGTH_LONG);
-                        toast.show();
-
                         phoneNo = senderNum;
 
-                        if (servicesConnected()) {
+                        String[] msg = message.split(" ");
 
-                            locationClient = new LocationClient(context, this, this);
+                        Log.d("msg", msg.length + msg[7] + " " + message);
 
-                            locationClient.connect();
-
-                            Location loc = null;
-
-                            if(locationClient.isConnected()) {
-                                loc = locationClient.getLastLocation();
-
-                            }
-
-
-                            sendLoc(loc);
-
-
-                        } else {
-
-                            locationListener = new MyLocationListener();
-
-
-                            locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-
-                            Criteria criteria = new Criteria();
-                            provider = locationManager.getBestProvider(criteria, false);
-
-                            Location location = locationManager.getLastKnownLocation(provider);
-
-                            Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
-                            sendLoc(location);
-                            locationManager.requestLocationUpdates(provider, 4000, 1, (LocationListener) locationListener);
-
+                        if((msg[14] != null) && (msg[14].equals("Bananas!"))) {
+                            new GetLocation(context);
                         }
 
 
-                    } else {
-                        //sms.sendTextMessage(phoneNumber, null, "Yo", null, null);
+
 
                     }
 
@@ -131,19 +90,7 @@ public class IncomingSms extends BroadcastReceiver implements
     }
 
 
-    private void sendLoc(Location location) {
 
-        //if(currentLocation
-
-        final SmsManager sms = SmsManager.getDefault();
-        sms.sendTextMessage("+441355377112", null, "LNG: " + location.getLatitude() + " LAT: " + location.getLongitude(), null, null);
-        //sms.sendTextMessage("+441355377112", null, "Hello", null, null);
-
-
-        //locationManager.removeUpdates(locationListener);
-
-
-    }
 
     private static final int THIRTY_SECS = 1000 * 30;
 
@@ -159,83 +106,6 @@ public class IncomingSms extends BroadcastReceiver implements
     }
 
 
-    private boolean servicesConnected() {
-        // Check that Google Play services is available
-        int resultCode =
-                GooglePlayServicesUtil.
-                        isGooglePlayServicesAvailable(context);
-        // If Google Play services is available
-        if (ConnectionResult.SUCCESS == resultCode) {
-            // In debug mode, log the status
-            Log.d("Location Updates",
-                    "Google Play services is available.");
-            // Continue
-            return true;
-            // Google Play services was not available for some reason.
-            // resultCode holds the error code.
-        } else {
-            // Get the error dialog from Google Play services
-
-            return false;
-
-        }
-    }
 
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.d("LATLNG", "CONNECTED");
-        Location loc = locationClient.getLastLocation();
-
-        Log.d("LATLNG", loc.toString());
-         sendLoc(loc);
-
-}
-
-    @Override
-    public void onDisconnected() {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(context, "Failed", Toast.LENGTH_LONG).show();
-    }
-
-    public class MyLocationListener implements LocationListener {
-
-        @Override
-        public void onLocationChanged(Location location) {
-            // TODO Auto-generated method stub
-            if (location != null) {
-                Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
-
-
-                sendLoc(location);
-
-
-            }
-            Log.v("Location Changed", "nkjhio");
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            // TODO Auto-generated method stub
-
-        }
-
-
-    }
 }

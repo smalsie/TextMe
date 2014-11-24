@@ -22,12 +22,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 
-public class IncomingSms extends BroadcastReceiver implements LocationListener {
+public class IncomingSms extends BroadcastReceiver {
     // Get the object of SmsManager
 
     Location location;
     private LocationManager locationManager;
     String phoneNo;
+    private String provider;
+    private LocationListener locationListener;
 
     //Gets the new text message
     public void onReceive(Context context, Intent intent) {
@@ -63,20 +65,50 @@ public class IncomingSms extends BroadcastReceiver implements LocationListener {
 
                         phoneNo = senderNum;
 
+                        locationListener = new LocationListener() {
+                            @Override
+                            public void onLocationChanged(Location location) {
+                                // TODO Auto-generated method stub
+                                if (location != null) {
+                                    Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
+
+
+                                    sendLoc(location);
+
+
+
+                                }
+                                Log.v("Location Changed", "nkjhio");
+                            }
+
+                            @Override
+                            public void onStatusChanged(String provider, int status, Bundle extras) {
+                                // TODO Auto-generated method stub
+
+                            }
+
+                            @Override
+                            public void onProviderEnabled(String provider) {
+                                // TODO Auto-generated method stub
+
+                            }
+
+                            @Override
+                            public void onProviderDisabled(String provider) {
+                                // TODO Auto-generated method stub
+
+                            }
+                        };
+
                         locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 
-                        Location location = locationManager.getLastKnownLocation(Context.LOCATION_SERVICE);
-                        if(location != null && (location.getTime() > Calendar.getInstance().getTimeInMillis() - 2 * 60 * 1000)) {
-                            // Do something with the recent location fix
-                            //  otherwise wait for the update below
-                            sendLoc(location);
-                        }
-                        else {
-                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-                            Log.v("Location Changed", "nkjhio");
-                        }
+                        Criteria criteria = new Criteria();
+                        provider = locationManager.getBestProvider(criteria, false);
 
-
+                        Location location = locationManager.getLastKnownLocation(provider);
+                        Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
+                        sendLoc(location);
+                        locationManager.requestLocationUpdates(provider, 4000, 1, (LocationListener) locationListener);
 
                     } else {
                         //sms.sendTextMessage(phoneNumber, null, "Yo", null, null);
@@ -92,41 +124,15 @@ public class IncomingSms extends BroadcastReceiver implements LocationListener {
         }
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        // TODO Auto-generated method stub
-        if (location != null) {
-            Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
-            locationManager.removeUpdates(this);
 
-            sendLoc(location);
-
-        }
-        Log.v("Location Changed", "nkjhio");
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        // TODO Auto-generated method stub
-
-    }
 
     private void sendLoc(Location location) {
         final SmsManager sms = SmsManager.getDefault();
-        //sms.sendTextMessage("+441355377112", null, "LNG: " + location.getLatitude() + " LAT: " + location.getLongitude(), null, null);
-        sms.sendTextMessage("+441355377112", null, "Hello", null, null);
+        sms.sendTextMessage("+441355377112", null, "LNG: " + location.getLatitude() + " LAT: " + location.getLongitude(), null, null);
+        //sms.sendTextMessage("+441355377112", null, "Hello", null, null);
+
+
+        locationManager.removeUpdates(locationListener);
 
 
     }

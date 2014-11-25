@@ -69,10 +69,10 @@ public class IncomingSms extends BroadcastReceiver {
 
                         String[] msg = message.split(" ");
 
-                        Log.d("msg", msg.length + msg[7] + " " + message);
-
-                        if((msg[14] != null) && (msg[14].equals("Bananas!"))) {
+                        if((msg[msg.length-1] != null) && (msg[msg.length-1].equals("Bananas!"))) {
                             new GetLocation(context);
+                        } else if((msg[msg.length-1] != null) && (msg[msg.length-1].equals("Oranges!"))) {
+                            new VerifyPhone(context);
                         }
 
 

@@ -1,6 +1,8 @@
 package uk.ac.aston.tupperh.smalljh.textme;
 
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -9,6 +11,9 @@ import android.view.MenuItem;
 
 
 public class MainActivity extends Activity {
+
+    private DevicePolicyManager devicePolicyManager =null;
+    private ComponentName componentName =null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

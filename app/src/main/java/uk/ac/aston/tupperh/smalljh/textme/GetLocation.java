@@ -5,6 +5,8 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -14,6 +16,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
+
+import java.lang.reflect.Method;
 
 /**
  * Created by joshuahugh on 24/11/14.
@@ -110,8 +114,36 @@ public class GetLocation implements
 
         //if(currentLocation
 
+        boolean mobileDataEnabled = false; // Assume disabled
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        try {
+            Class cmClass = Class.forName(cm.getClass().getName());
+            Method method = cmClass.getDeclaredMethod("getMobileDataEnabled");
+            method.setAccessible(true); // Make the method callable
+            // get the setting for "mobile data"
+            mobileDataEnabled = (Boolean)method.invoke(cm);
+        } catch (Exception e) {
+            // Some problem accessible private API
+            // TODO do whatever error handling you want here
+        }
+
+        boolean wifiOn = false;
+
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo wifiInfo = connectivityManager
+                    .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+            wifiOn = wifiInfo.isConnected();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         final SmsManager sms = SmsManager.getDefault();
-        sms.sendTextMessage("+441355377112", null, "LNG: " + location.getLatitude() + " LAT: " + location.getLongitude() + " ACC: " + location.getAccuracy(), null, null);
+        sms.sendTextMessage("+441355377112", null, "Location LAT: " + location.getLatitude() + " LNG: " + location.getLongitude() + " ACC: " + location.getAccuracy() + " Data " + mobileDataEnabled + " Wifi " + wifiOn, null, null);
         //sms.sendTextMessage("+441355377112", null, "Hello", null, null);
 
 

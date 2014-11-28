@@ -1,14 +1,13 @@
 package uk.ac.aston.tupperh.smalljh.textme;
 
 import android.app.admin.DeviceAdminReceiver;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.preference.Preference;
 
 /**
  * Created by joshuahugh on 25/11/14.
+ *
+ * DELETE??
  */
 public class ChangePassword extends DeviceAdminReceiver {
 

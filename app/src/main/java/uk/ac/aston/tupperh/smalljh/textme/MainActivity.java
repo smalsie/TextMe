@@ -3,13 +3,19 @@ package uk.ac.aston.tupperh.smalljh.textme;
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
-import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+/**
+ *
+ * @author Hugh Tupper and Joshua Small
+ * @version 15/11/2014
+ * An Activity is required so load in here
+ *
+ */
 
 
+//All auto generated below
 public class MainActivity extends Activity {
 
     private DevicePolicyManager devicePolicyManager =null;

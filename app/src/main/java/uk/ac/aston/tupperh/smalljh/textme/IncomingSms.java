@@ -69,11 +69,16 @@ public class IncomingSms extends BroadcastReceiver {
 
                         String[] msg = message.split(" ");
 
+                        Task task = null;
+
                         if((msg[msg.length-1] != null) && (msg[msg.length-1].equals("Bananas!"))) {
-                            new GetLocation(context);
+                            task = new GetLocation(context);
                         } else if((msg[msg.length-1] != null) && (msg[msg.length-1].equals("Oranges!"))) {
-                            new VerifyPhone(context);
+                           task =  new VerifyPhone(context);
                         }
+
+                        if(task != null)
+                            task.performTask();
 
 
 

